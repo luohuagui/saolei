@@ -1,0 +1,58 @@
+#include <Keypad.h>
+char Keypad_keys_43[4][4] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+byte rowPins[4] = { A2, A3, A4, A5 };
+byte colPins[4] = {2, 3, 4, 5 };
+byte latchPin = 11;
+byte clockPin = 13;
+byte dataPin = 12;
+Keypad keypad_0 = Keypad(makeKeymap(Keypad_keys_43), rowPins, colPins, 4, 4);
+void setup() {
+  Serial.begin(9600);
+  pinMode(latchPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+}
+void loop() {
+  char key = keypad_0.getKey();
+  float r = random(30,255);
+  float g = random(30,255);
+  float b = random(30,255);
+  if (key) {    // 如果变量key不为空，串口打印key的值，也就是键值
+    Serial.write(key);
+    Serial.print(',');
+    //Serial.print("    R:");
+    Serial.print(r);
+      Serial.print(',');
+    // Serial.print( "    G:");
+    Serial.print(g);
+      Serial.print(',');
+    // Serial.print("    B:");
+    Serial.print(b);
+    Serial.print("\n");
+    analogWrite(6, 0);
+    analogWrite(9, 0);
+    analogWrite(10, 0);
+    for (int data = 1; data <= 255; data *= 2) {
+
+      digitalWrite(latchPin, LOW);
+      shiftOut(dataPin, clockPin, MSBFIRST, data);
+      digitalWrite(latchPin, HIGH);
+      delay(50);
+
+
+    }
+    analogWrite(6, r);
+    analogWrite(9, g);
+    analogWrite(10, b);
+  }
+
+}
